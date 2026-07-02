@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WB DA Hike Calculator — 2026</title>
+<style>
+  :root {
+    --ink: #1c2b24;
+    --paper: #f6f3ec;
+    --paper-raised: #ffffff;
+    --moss: #2f5d4e;
+    --moss-deep: #1e3f34;
+    --marigold: #d99b2b;
+    --marigold-soft: #f2dcae;
+    --line: #d8d0bd;
+    --muted: #6b6357;
+    --good: #2f5d4e;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Iowan Old Style', 'Georgia', serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .masthead {
+    border-bottom: 3px solid var(--ink);
+    padding: 28px 24px 18px;
+    text-align: center;
+    position: relative;
+  }
+
+  .masthead::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--moss) 0px, var(--moss) 24px,
+      var(--marigold) 24px, var(--marigold) 48px
+    );
+  }
+
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--moss);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+
+  h1 span {
+    color: var(--marigold);
+    font-style: italic;
+  }
+
+  .subhead {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+
+  .panel-head {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--moss);
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .field-group {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .field-group:last-child { border-bottom: none; }
+
+  label {
+    display: block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    color: var(--ink);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .hint {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  input[type="number"], select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  input[type="number"]:focus, select:focus {
+    outline: 2px solid var(--moss);
+    outline-offset: 1px;
+    background: #fff;
+  }
+
+  .toggle-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .toggle-btn.active {
+    background: var(--moss);
+    border-color: var(--moss);
+    color: #fff;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* results panel */
+  .results-panel {
+    background: var(--moss-deep);
+    color: #f2ede0;
+    border: none;
+  }
+
+  .results-panel .panel-head {
+    color: var(--marigold-soft);
+    border-bottom-color: rgba(255,255,255,0.14);
+  }
+
+  .headline-figure {
+    padding: 22px 20px 8px;
+    text-align: center;
+  }
+
+  .headline-figure .label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(242,237,224,0.65);
+    margin-bottom: 6px;
+  }
+
+  .headline-figure .amount {
+    font-size: clamp(34px, 6vw, 50px);
+    font-weight: 700;
+    color: var(--marigold);
+    line-height: 1;
+  }
+
+  .headline-figure .sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12.5px;
+    color: rgba(242,237,224,0.75);
+    margin-top: 6px;
+  }
+
+  .divider-date {
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: rgba(242,237,224,0.6);
+    padding: 10px 20px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+  }
+
+  .divider-date strong { color: var(--marigold-soft); }
+
+  .breakdown {
+    padding: 18px 20px 6px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13.5px;
+    border-bottom: 1px dashed rgba(255,255,255,0.14);
+  }
+
+  .row .name { color: rgba(242,237,224,0.85); }
+  .row .val { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .row .val.delta { color: var(--marigold); font-size: 11.5px; margin-left: 6px; font-weight: 700; }
+
+  .row.total {
+    border-bottom: none;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 6px;
+    padding-top: 14px;
+    font-size: 15px;
+  }
+  .row.total .name { color: #fff; font-weight: 700; }
+  .row.total .val { color: var(--marigold); font-size: 17px; }
+
+  .compare-old {
+    padding: 4px 20px 20px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11.5px;
+    color: rgba(242,237,224,0.55);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  footer {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">West Bengal · Budget 2026–27</div>
+  <h1>The DA Hike, <span>Worked Out</span></h1>
+  <p class="subhead">Dearness Allowance rises 20 points to 38%, effective 1 October 2026. Enter your pay details to see exactly what changes.</p>
+</div>
+
+<div class="wrap">
+
+  <div class="panel">
+    <div class="panel-head">Your Details</div>
+
+    <div class="field-group">
+      <label>You are a</label>
+      <div class="toggle-row">
+        <div class="toggle-btn active" id="btn-employee" onclick="setStatus('employee')">Employee</div>
+        <div class="toggle-btn" id="btn-pensioner" onclick="setStatus('pensioner')">Pensioner</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label id="basicLabel">Basic Pay (₹ / month)</label>
+      <input type="number" id="basic" value="35000" min="0" oninput="calculate()">
+      <div class="hint">Your basic pay before any allowances.</div>
+    </div>
+
+    <div class="field-group">
+      <label>NPA — Non-Practicing Allowance (₹, optional)</label>
+      <input type="number" id="npa" value="0" min="0" oninput="calculate()">
+      <div class="hint">Applicable to medical officers. DA is calculated on Basic + NPA.</div>
+    </div>
+
+    <div class="field-group">
+      <label>DA rate — before → after</label>
+      <div class="two-col">
+        <input type="number" id="daOld" value="18" min="0" step="0.5" oninput="calculate()">
+        <input type="number" id="daNew" value="38" min="0" step="0.5" oninput="calculate()">
+      </div>
+      <div class="hint">Defaults to the announced change (18% → 38%). Edit to test other slabs.</div>
+    </div>
+
+    <div class="field-group">
+      <label>House Rent Allowance</label>
+      <input type="number" id="hraPct" value="12" min="0" step="0.5" oninput="calculate()">
+      <div class="hint">HRA %, calculated on Basic Pay. Defaults to 12%.</div>
+    </div>
+
+    <div class="field-group">
+      <label>Other allowances (₹ / month)</label>
+      <div class="two-col">
+        <div>
+          <input type="number" id="medical" value="500" min="0" oninput="calculate()">
+          <div class="hint">Medical allowance</div>
+        </div>
+        <div>
+          <input type="number" id="transport" value="1200" min="0" oninput="calculate()">
+          <div class="hint">Transport allowance</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <input type="number" id="otherAllow" value="0" min="0" oninput="calculate()">
+        <div class="hint">Any other fixed allowance</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel" style="grid-column: 1 / -1;">
+    <div class="panel-head">Deductions</div>
+
+    <div class="field-group">
+      <div class="two-col">
+        <div>
+          <label>GIS-I (1987 scheme) ₹</label>
+          <input type="number" id="gisI" value="0" min="0" oninput="calculate()">
+        </div>
+        <div>
+          <label>GIS-S (1987 scheme) ₹</label>
+          <input type="number" id="gisS" value="0" min="0" oninput="calculate()">
+        </div>
+      </div>
+      <div class="hint">Fixed monthly subscription per your slab — check your payslip or GIS table for the exact amount.</div>
+    </div>
+
+    <div class="field-group">
+      <label>Provident Fund</label>
+      <div class="toggle-row" style="margin-bottom:10px;">
+        <div class="toggle-btn active" id="btn-gpf" onclick="setPFType('gpf')">GPF</div>
+        <div class="toggle-btn" id="btn-epfo" onclick="setPFType('epfo')">EPFO</div>
+      </div>
+      <div class="two-col">
+        <div>
+          <input type="number" id="pfPct" value="6" min="0" step="0.5" oninput="calculate()">
+          <div class="hint" id="pfHint">% of Basic Pay (min. 6% for GPF)</div>
+        </div>
+        <div>
+          <input type="number" id="pfAmount" value="" placeholder="or enter ₹ directly" min="0" oninput="calculate()">
+          <div class="hint">Overrides % if filled in</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Professional Tax</label>
+      <div class="two-col">
+        <div>
+          <input type="number" id="ptAuto" disabled>
+          <div class="hint">Auto, per WB PT slab on gross</div>
+        </div>
+        <div>
+          <input type="number" id="ptOverride" value="" placeholder="or enter ₹ directly" min="0" oninput="calculate()">
+          <div class="hint">Overrides auto value if filled in</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel results-panel">
+    <div class="panel-head">Monthly Impact</div>
+
+    <div class="headline-figure">
+      <div class="label">Net increase per month</div>
+      <div class="amount" id="netIncrease">₹0</div>
+      <div class="sub" id="annualIncrease">₹0 more per year</div>
+    </div>
+
+    <div class="divider-date">Effective from <strong>1 October 2026</strong> · DA rate <span id="dateNote">18% → 38%</span></div>
+
+    <div class="breakdown">
+      <div class="row">
+        <span class="name">Basic Pay <span id="npaTag" style="opacity:0.6;"></span></span>
+        <span class="val" id="basicRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name">Dearness Allowance</span>
+        <span class="val"><span id="daNewRow">₹0</span><span class="val delta" id="daDelta">+₹0</span></span>
+      </div>
+      <div class="row">
+        <span class="name">House Rent Allowance</span>
+        <span class="val" id="hraRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name">Medical Allowance</span>
+        <span class="val" id="medicalRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name">Transport Allowance</span>
+        <span class="val" id="transportRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name">Other Allowance</span>
+        <span class="val" id="otherRow">₹0</span>
+      </div>
+      <div class="row total">
+        <span class="name">New Gross Total</span>
+        <span class="val" id="totalNew">₹0</span>
+      </div>
+    </div>
+
+    <div class="compare-old">
+      <span>Old gross (at <span id="oldPct">18%</span> DA): <span id="totalOld">₹0</span></span>
+    </div>
+
+    <div class="panel-head" style="border-top:1px solid rgba(255,255,255,0.14);">Deductions</div>
+
+    <div class="breakdown">
+      <div class="row">
+        <span class="name">GIS-I (1987)</span>
+        <span class="val" id="gisIRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name">GIS-S (1987)</span>
+        <span class="val" id="gisSRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name" id="pfLabelRow">GPF</span>
+        <span class="val" id="pfRow">₹0</span>
+      </div>
+      <div class="row">
+        <span class="name">Professional Tax</span>
+        <span class="val" id="ptRow">₹0</span>
+      </div>
+      <div class="row total">
+        <span class="name">Net Take-Home</span>
+        <span class="val" id="netTakeHome">₹0</span>
+      </div>
+    </div>
+
+    <div class="compare-old">
+      <span>Net take-home before hike: <span id="netTakeHomeOld">₹0</span></span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Figures are indicative, based on the 20-percentage-point DA/DR hike (18% → 38%) announced in West Bengal's 2026–27 Budget, effective 1 October 2026. HRA slabs follow the standard X/Y/Z city classification used in WB pay rules; confirm your exact city category and any allowance ceilings with your DDO or department circular before relying on these numbers for planning.
+</footer>
+
+<script>
+  let status = 'employee';
+  let pfType = 'gpf';
+
+  function setStatus(s) {
+    status = s;
+    document.getElementById('btn-employee').classList.toggle('active', s === 'employee');
+    document.getElementById('btn-pensioner').classList.toggle('active', s === 'pensioner');
+    document.getElementById('basicLabel').textContent = s === 'employee' ? 'Basic Pay (₹ / month)' : 'Basic Pension (₹ / month)';
+    calculate();
+  }
+
+  function setPFType(t) {
+    pfType = t;
+    document.getElementById('btn-gpf').classList.toggle('active', t === 'gpf');
+    document.getElementById('btn-epfo').classList.toggle('active', t === 'epfo');
+    document.getElementById('pfPct').value = t === 'gpf' ? 6 : 12;
+    document.getElementById('pfHint').textContent = t === 'gpf' ? '% of Basic Pay (min. 6% for GPF)' : '% of Basic Pay (standard 12% for EPFO)';
+    document.getElementById('pfLabelRow').textContent = t === 'gpf' ? 'GPF' : 'EPFO';
+    calculate();
+  }
+
+  function fmt(n) {
+    return '₹' + Math.round(n).toLocaleString('en-IN');
+  }
+
+  function ptSlab(gross) {
+    if (gross <= 10000) return 0;
+    if (gross <= 15000) return 110;
+    if (gross <= 25000) return 130;
+    if (gross <= 40000) return 150;
+    return 200;
+  }
+
+  function calculate() {
+    const basic = parseFloat(document.getElementById('basic').value) || 0;
+    const npa = parseFloat(document.getElementById('npa').value) || 0;
+    const daOld = parseFloat(document.getElementById('daOld').value) || 0;
+    const daNew = parseFloat(document.getElementById('daNew').value) || 0;
+    const hraPct = (parseFloat(document.getElementById('hraPct').value) || 0) / 100;
+    const medical = parseFloat(document.getElementById('medical').value) || 0;
+    const transport = parseFloat(document.getElementById('transport').value) || 0;
+    const other = parseFloat(document.getElementById('otherAllow').value) || 0;
+
+    const gisI = parseFloat(document.getElementById('gisI').value) || 0;
+    const gisS = parseFloat(document.getElementById('gisS').value) || 0;
+    const pfPct = (parseFloat(document.getElementById('pfPct').value) || 0) / 100;
+    const pfOverride = document.getElementById('pfAmount').value;
+    const ptOverrideVal = document.getElementById('ptOverride').value;
+
+    const daBase = basic + npa;
+    const daOldAmt = daBase * (daOld / 100);
+    const daNewAmt = daBase * (daNew / 100);
+    const daDeltaAmt = daNewAmt - daOldAmt;
+
+    const isPensioner = status === 'pensioner';
+    const hra = isPensioner ? 0 : basic * hraPct;
+    const transportShown = isPensioner ? 0 : transport;
+
+    const totalNew = basic + daNewAmt + hra + medical + transportShown + other;
+    const totalOld = basic + daOldAmt + hra + medical + transportShown + other;
+    const netIncrease = totalNew - totalOld;
+
+    const pfAmt = pfOverride !== '' ? (parseFloat(pfOverride) || 0) : basic * pfPct;
+    const ptAutoNew = ptSlab(totalNew);
+    const ptAutoOld = ptSlab(totalOld);
+    const ptAmtNew = ptOverrideVal !== '' ? (parseFloat(ptOverrideVal) || 0) : ptAutoNew;
+    const ptAmtOld = ptOverrideVal !== '' ? (parseFloat(ptOverrideVal) || 0) : ptAutoOld;
+
+    const totalDeductions = gisI + gisS + pfAmt + ptAmtNew;
+    const totalDeductionsOld = gisI + gisS + pfAmt + ptAmtOld;
+
+    const netTakeHome = totalNew - totalDeductions;
+    const netTakeHomeOld = totalOld - totalDeductionsOld;
+
+    document.getElementById('basicRow').textContent = fmt(basic);
+    document.getElementById('npaTag').textContent = npa > 0 ? `(+ NPA ${fmt(npa)})` : '';
+    document.getElementById('daNewRow').textContent = fmt(daNewAmt);
+    document.getElementById('daDelta').textContent = '+' + fmt(daDeltaAmt);
+    document.getElementById('hraRow').textContent = isPensioner ? '— (n/a)' : fmt(hra);
+    document.getElementById('medicalRow').textContent = fmt(medical);
+    document.getElementById('transportRow').textContent = isPensioner ? '— (n/a)' : fmt(transportShown);
+    document.getElementById('otherRow').textContent = fmt(other);
+    document.getElementById('totalNew').textContent = fmt(totalNew);
+    document.getElementById('totalOld').textContent = fmt(totalOld);
+    document.getElementById('oldPct').textContent = daOld + '%';
+    document.getElementById('dateNote').textContent = daOld + '% → ' + daNew + '%';
+    document.getElementById('netIncrease').textContent = fmt(netIncrease);
+    document.getElementById('annualIncrease').textContent = fmt(netIncrease * 12) + ' more per year';
+
+    document.getElementById('gisIRow').textContent = fmt(gisI);
+    document.getElementById('gisSRow').textContent = fmt(gisS);
+    document.getElementById('pfRow').textContent = fmt(pfAmt);
+    document.getElementById('ptAuto').value = ptAutoNew;
+    document.getElementById('ptRow').textContent = fmt(ptAmtNew);
+    document.getElementById('netTakeHome').textContent = fmt(netTakeHome);
+    document.getElementById('netTakeHomeOld').textContent = fmt(netTakeHomeOld);
+  }
+
+  calculate();
+</script>
+
+</body>
+</html>
